@@ -72,9 +72,17 @@ function start()
         return;
     end
 
-    % Launch Python script in background using nohup to ensure persistence
+    % Launch Python script in background using start command (operating system specific) to ensure persistence
     % Redirect output to /dev/null
-    command = sprintf('nohup "%s" "%s" "%s" "%s" > /dev/null 2>&1 &', pythonExecutable, pythonScriptPath, commFilePath, currentFile);
+    if ispc
+        command = sprintf('start /B "DiscordRPC" "%s" "%s" "%s" "%s" > NUL 2>&1', pythonExecutable, pythonScriptPath, commFilePath, currentFile);
+    elseif isunix
+        command = sprintf('nohup "%s" "%s" "%s" "%s" > /dev/null 2>&1 &', pythonExecutable, pythonScriptPath, commFilePath, currentFile);
+    elseif ismac
+        command = sprintf('open "%s" "%s" "%s" "%s" > /dev/null 2>&1 &', pythonExecutable, pythonScriptPath, commFilePath, currentFile); % not sure if this works on mac...yet to test
+    else
+        error('Unsupported operating system for launching Python script.');
+    end
     
     [status, cmdout] = system(command); % Launch command
     if status ~= 0
